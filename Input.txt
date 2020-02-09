@@ -1,0 +1,89 @@
+restart               false
+numtimesteps          2     
+filterfrequency       10
+monitorfrequency      1
+checkpointfrequency   2
+timestepsize          2.0e-9
+maxtimestepsize       1e-6
+fixedtimestepsize     true
+px                    4
+py                    4
+pz                    4
+delx                  2e-6 # 2e-6
+dely                  2e-6
+delz                  2e-6
+periodic_x            true
+periodic_y            true
+periodic_z            true
+split_chemistry       true
+strang_splitting      true
+Twall                 500
+Ghost_Points          8
+Wall                  Adiabatic
+maxwalltime           1000
+QuiescentPressure     35.0
+# -----------------------------------------------
+rwIO_option           3
+outputField           10
+compHeating           false  #true/false
+#
+ign_src               false  #true/false
+t_ignSrcDur           10.0E-6 #(s)
+EigDensity            2.0E12
+Rig                   0.5E-3
+x_ig                  0.0 # 0.5*sx
+y_ig                  0.5 # 0.5*sy
+z_ig                  0.5 # 0.5*sz
+# {x (mm)}=5e-3*v1 -8*5e-3
+#
+injFuelMode           false  #true/false
+injH2OMode            false  #true/false
+t_injDur              0.5E-4 #(s)
+t_inj                 2.50E-3 #(s)
+# -----------------------------------------------
+T_ignition           1500.0     # threshold of ignition temperature 
+timestep_ign         2.0e-9     # ignition time step
+# -----------------------------------------------
+# flags to capture detonation
+#----------------------------------------------------------------------------------------------
+pressure_det         120.      # detonation pressure threshold > 0D equilibrium press (atm)
+timestep_det         5.00e-10   # time step to capture detonation
+monitorfreq_det      10         # frequency to monitor max values if pressure_det
+checkpointfreq_det   200        # frequency to save fields if pressure_det
+outputFieldfreq_det  200        # frequency to save fields if pressure_det
+Tmin_det_stop        5300.0     # Minimum temperature to terminate the program (K)
+#----------------------------------------------------------------------------------------------
+
+############ PARAMETERS ONLY FOR FLAME SIMULATIONS WITH INFLOW-OUTFLOW ##############
+
+Amp_Phi		            0.2
+Amp_T		              50
+AFuel                 0.0205
+AO2                   0.00478
+AN2                   0.01572
+Pr_Phi                480e-6
+Pr_T                  480e-6
+Phase_T		            0
+Phase_Phi	            0
+lag_T                 0
+lag_Phi               0
+Variable              Phi+Temperature
+Fuel1                 CH3OCH3
+Fuel2                 CH4
+Phi_Fuel1             0.4
+Phi_Fuel2             0.0
+Phi_Oxi1              3.0
+Phi_Oxi2              11.28
+RCCI                  false
+Lambda                0.894e-3
+Simulation            1D
+tstart                0.0
+Inlet_Pressure        20
+Delta_P               0
+sigma                 3.125e-5
+Anchor                3.125e-4
+T_Inlet               800
+CompHeatModel	        Isentropic
+CH+Phi                false
+CH+T                  false
+Inflow_Velocity    
