@@ -1,0 +1,90 @@
+# =====================================================
+#! 1. set up the working directory
+# =====================================================
+DIR=$HOME/k1164/$USER/karfs_MLBS
+cd $DIR
+
+# ==================================
+#! 2. Download the source code, karfs_dev 
+# ==================================
+# I shared with you the source code via bitbucket
+# change xxxxx with your username of bitbucket, $USER
+git clone https://xxxxx@bitbucket.org/minhbau/karfs_dev.git
+cd $DIR/karfs_dev/
+# switch to MLBS branch that we  will work on
+git checkout MLBS
+# ==================================
+
+
+# ==================================
+#! 3. load required modules and environment variables
+# ==================================
+module swap PrgEnv-cray PrgEnv-intel
+module load cray-python/2.7.15.7
+module load cray-hdf5-parallel/1.10.5.2
+module load gcc/8.3.0
+# update the newest compliers if needed
+module load cdt/19.12 
+
+# Add  myboost module  to MODULEPATH:
+export MODULEPATH="$MODULEPATH:/project/k1164/shared/modulefiles"
+module load myboost-intel/1.67
+# ==================================
+
+# ==================================
+#! 4. Linking required libraries
+# ==================================
+ln -s /project/k1164/shared/kokkos-intel $DIR/karfs_dev/TPLs/kokkos
+ln -s /project/k1164/shared/cantera-2.2-intel $DIR/karfs_dev/TPLs/cantera
+
+
+# ==================================
+#! 5. Create build directory and build the code here
+# ==================================
+mkdir  build
+cd build
+export CRAYPE_LINK_TYPE=dynamic
+cmake ../src  -DCMAKE_BUILD_TYPE=Release
+make -j
+# ==================================
+
+
+# ==================================
+#! 6. Test: run the program, named DNS
+# ==================================
+cd $DIR/karfs_dev/
+mkdir -p test_karfs/data test_karfs/run
+cd $DIR/karfs_dev/test_karfs/run
+cp $DIR/karfs_dev/build/DNS .
+
+# Download the input files 
+git clone https://github.com/MinhBauLuong/input_karfs_MLBS.git
+cp input_karfs_MLBS/* .
+
+# submit a job, named DNS
+sbatch run_KARFS_onShaheen.sh
+
+# track the submitted job
+squeue -u $USER
+# to cancel a job with, e.g, JOBID=13567143
+scancel 13567143
+
+NOTE: 
+1. the output data is written to ../data directory
+2. #SBATCH --partition=debug 
+# debug flag is set in run_KARFS_onShaheen.sh so the the job can run shortly
+if more cores needed, comment out this line with ## 
+# read more here https://www.hpc.kaust.edu.sa/tips/debug-and-72hours-queue
+
+3. to change a size of a block data (dimension, e.g., 32x32x32) in src/CMakeLists.txt
+# set_property(TARGET DNS APPEND PROPERTY COMPILE_DEFINITIONS BLOCKNX=32 BLOCKNY=32 BLOCKNZ=32 BLOCKNTX=1)
+4. The number of cores, checkpointfrequency, numtimesteps, etc are set in Input.txt
+
+5. Introduce a flag, example in src/DNS.C: 
+if(param.getbool("periodic_x")) 
+
+6. mkdir data_stripe144
+lfs setstripe data_stripe144 -c 144
+lfs getstripe data_stripe144/
+
+
